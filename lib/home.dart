@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -8,20 +7,21 @@ import 'fichart.dart';
 import 'login.dart';
 import 'model/expense.dart';
 
+
 class HomeScreen extends StatefulWidget {
-
-
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  _HomeScreenState createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  String _username = ''; // Variable to hold the username
+  String _username = '';
+  double totalExpenses = 0.0; // To hold the total expenses
 
   @override
   void initState() {
     super.initState();
     _getUsername(); // Get the username when the screen initializes
+    _calculateTotalExpenses(); // Calculate total expenses on screen load
   }
 
   // Function to retrieve the username from SharedPreferences
@@ -31,15 +31,22 @@ class _HomeScreenState extends State<HomeScreen> {
       _username = prefs.getString('username') ?? 'User'; // Default to 'User' if not found
     });
   }
+
+  // Function to calculate the total expenses
+  void _calculateTotalExpenses() {
+    var expenseBox = Hive.box<Expense>('expenses');
+    setState(() {
+      totalExpenses = expenseBox.values.fold(0, (sum, expense) => sum + expense.amount);
+    });
+  }
+
+  // Call this function to refresh the total expenses when returning from another screen
+  Future<void> _refreshTotalExpenses() async {
+    _calculateTotalExpenses(); // Recalculate total expenses
+  }
+
   @override
   Widget build(BuildContext context) {
-
-    // Open the 'expenses' box
-    var expenseBox = Hive.box<Expense>('expenses');
-
-    // Calculate total expenses by summing all the expense amounts
-    double totalExpenses = expenseBox.values.fold(0, (sum, expense) => sum + expense.amount);
-
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -62,6 +69,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               },
             ),
+            Padding(
+              padding: const EdgeInsets.only(right: 10),
+              child: Image(
+                image: AssetImage('assets/img/budget (1).png'),
+                height: 50,
+                width: 50,
+              ),
+            ),
           ],
         ),
         body: Center(
@@ -72,31 +87,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 "Welcome, $_username!", // Display the username
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
+              SizedBox(height: 20),
               Text(
-                "Total Expenses: \$${totalExpenses.toStringAsFixed(2)}",
+                "Total Expenses: \$${totalExpenses.toStringAsFixed(2)}", // Show updated total expenses
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 20),
-              _buildActionButton(
-                context,
-                'Add Expense',
-                Icons.add,
-                AddExpenseScreen(),
-              ),
+              _buildActionButton(context, 'Add Expense', Icons.add, AddExpenseScreen(), _refreshTotalExpenses),
               SizedBox(height: 10),
-              _buildActionButton(
-                context,
-                'View Expenses',
-                Icons.monetization_on_rounded,
-                ExpenseListScreen(),
-              ),
+              _buildActionButton(context, 'View Expenses', Icons.monetization_on_rounded, ExpenseListScreen(), _refreshTotalExpenses),
               SizedBox(height: 10),
-              _buildActionButton(
-                context,
-                'View Summary',
-                Icons.pie_chart,
-                SummaryScreen(),
-              ),
+              _buildActionButton(context, 'View Summary', Icons.pie_chart, SummaryScreen(), _refreshTotalExpenses),
             ],
           ),
         ),
@@ -104,10 +105,15 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildActionButton(BuildContext context, String label, IconData icon, Widget route) {
+  // Function to build the action buttons (Add Expense, View Expenses, etc.)
+  Widget _buildActionButton(BuildContext context, String label, IconData icon, Widget route, Function onReturn) {
     return InkWell(
-      onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => route));
+      onTap: () async {
+        await Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => route),
+        );
+        onReturn(); // Refresh total expenses when returning to the home screen
       },
       child: Container(
         height: 100,
