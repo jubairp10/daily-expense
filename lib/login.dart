@@ -62,6 +62,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         borderSide: BorderSide(color: Colors.black),
                       ),
                       labelText: "Username",
+                      prefixIcon: Icon(Icons.account_circle)
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -81,6 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       labelText: "Password",
+                      prefixIcon: Icon(Icons.password)
                     ),
                     obscureText: true,
                     validator: (value) {

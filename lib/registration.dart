@@ -39,7 +39,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 decoration: InputDecoration( border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide(color: Colors.black)),
-                    labelText: "Username"),
+                    labelText: "Username",
+                prefixIcon: Icon(Icons.account_circle)),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your username';
@@ -49,11 +50,33 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               ),
               SizedBox(height: 20,),
               TextFormField(
+
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.black),
+                  ),
+                  labelText: "E-mail",
+                  prefixIcon: Icon(Icons.email)
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your email';
+                  } else if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                    return 'Please enter a valid email';
+                  }
+                  return null;
+                },
+              ),
+
+              SizedBox(height: 20,),
+              TextFormField(
                 controller: _passwordController,
                 decoration: InputDecoration( border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide(color: Colors.black)),
-                    labelText: "Password"),
+                    labelText: "Password",
+                prefixIcon:Icon(Icons.password)),
                 obscureText: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {

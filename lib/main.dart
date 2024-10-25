@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:texol/splash%20screen.dart';
 
 import 'expense provider.dart';
 import 'login.dart';
@@ -29,7 +30,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Expense Tracker',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: LoginScreen(),
+      home: SplashScreen(),
     );
   }
 }
